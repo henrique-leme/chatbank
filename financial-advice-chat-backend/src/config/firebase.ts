@@ -1,11 +1,13 @@
-import admin from "firebase-admin";
-
-const serviceAccount = require("../path/to/serviceAccountKey.json"); // Certifique-se de configurar a chave correta do Firebase
+import * as admin from "firebase-admin";
 
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://<your-project-id>.firebaseio.com",
+  credential: admin.credential.cert({
+    projectId: process.env.FIREBASE_PROJECT_ID,
+    clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+    privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+  }),
+  databaseURL: "https://your-database-name.firebaseio.com",
 });
 
-const db = admin.firestore();
-export { db };
+export const db = admin.firestore();
+export const auth = admin.auth();
