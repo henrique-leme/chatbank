@@ -1,22 +1,27 @@
 import React from "react";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import Home from "./pages/Home";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
-import Signup from "./pages/Signup";
+import Register from "./pages/Register";
 import Chat from "./pages/Chat";
-import PrivateRoute from "./components/PrivateRoute";
+import { AuthProvider } from "./context/AuthContext";
+import EvaluateProfile from "./pages/EvaluateProfile";
+import EditProfilePage from "./pages/EditProfilePage";
 
-const Routes: React.FC = () => {
+const AppRoutes: React.FC = () => {
   return (
     <Router>
-      <Switch>
-        <Route path="/login" component={Login} />
-        <Route path="/signup" component={Signup} />
-        <PrivateRoute path="/chat" component={Chat} />
-        <Route path="/" component={Home} />
-      </Switch>
+      <AuthProvider>
+        <Routes>
+          <Route path="/" element={<Login />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/profile" element={<EditProfilePage />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/profile-evaluation" element={<EvaluateProfile />} />
+          <Route path="/chat" element={<Chat />} />
+        </Routes>
+      </AuthProvider>
     </Router>
   );
 };
 
-export default Routes;
+export default AppRoutes;
