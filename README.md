@@ -21,6 +21,7 @@ Financial Advice Chat é um serviço abrangente desenvolvido para fornecer acons
 ### ⚙️ Funcionalidades
 
 - **Frontend:**
+
   - Interface de Usuário para Conversas Financeiras
   - Integração com Backend via API REST
   - Design Responsivo
@@ -69,13 +70,13 @@ Certifique-se de ter instalado:
 1. Clone o repositório:
 
    ```sh
-   git clone https://github.com/seu-usuario/financial-advice-chat.git
+   git clone https://github.com/henrique-leme/chatbank.git
    ```
 
 2. Navegue para a pasta do projeto:
 
    ```sh
-   cd financial-advice-chat/chatbank
+   cd chatbank
    ```
 
 3. Instale as dependências do frontend:
@@ -113,6 +114,8 @@ Certifique-se de ter instalado:
 
    **Importante:** Abra o CMD, aguarde o download dos modelos e feche o terminal após o processo ser concluído.
 
+7. Baixe a configuração de projeto do Firebase e copie para `financial-advice-chat-backend\src\config`, o arquivo deve ter o nome de adminsdk.json, e pode ser encontrado no console da aplicação dentro do [Firebase](https://console.firebase.google.com/u/1/project/financial-advice-chat/settings/general/web:Mjk1ODQ2M2ItZDg0MS00NWNlLWE2NjgtYjM3MDQ2YjY4MDdj?hl=pt-br)
+
 ## ⚙️ Como Executar
 
 1. Inicie o servidor do Ollama:
@@ -146,6 +149,7 @@ Certifique-se de ter instalado:
 ## 🛠️ Construído com
 
 - **Frontend:**
+
   - [React](https://reactjs.org/) - Biblioteca para construção de interfaces de usuário
   - [TypeScript](https://www.typescriptlang.org/) - Linguagem de programação
   - [Vite](https://vitejs.dev/) - Ferramenta de build
@@ -156,6 +160,7 @@ Certifique-se de ter instalado:
   - [Zod](https://zod.dev/) - Validação de esquemas
 
 - **Backend:**
+
   - [Node.js](https://nodejs.org/) - Ambiente de execução
   - [Express](https://expressjs.com/) - Framework web
   - [TypeScript](https://www.typescriptlang.org/) - Linguagem de programação
@@ -171,9 +176,9 @@ Certifique-se de ter instalado:
 
 ## ✒️ Autores
 
-- **Seu Nome** - _Desenvolvedor Principal_ - [GitHub](https://github.com/seu-usuario)
+- **Seu Nome** - _Desenvolvedor Principal_ - [GitHub](https://github.com/henrique-leme)
 
-Veja também a lista de [colaboradores](https://github.com/seu-usuario/financial-advice-chat/contributors) que participaram deste projeto.
+Veja também a lista de [colaboradores](https://github.com/henrique-leme/financial-advice-chat/contributors) que participaram deste projeto.
 
 ## 📄 Licença
 
@@ -182,9 +187,11 @@ Este projeto está licenciado sob a licença MIT - veja o arquivo [LICENSE](LICE
 ## 🎯 Conceitos e Arquitetura
 
 - **Padrões de Design:**
+
   - **MVC (Model-View-Controller)**
 
 - **Conceitos de Arquitetura:**
+
   - **Arquitetura em Camadas** (Apresentação, Aplicação/Backend, Dados, Infraestrutura)
   - **Autenticação e Autorização com JWT**
   - **Integração de IA usando Ollama**
@@ -201,8 +208,8 @@ Este projeto está licenciado sob a licença MIT - veja o arquivo [LICENSE](LICE
 ## 📌 Notas Adicionais
 
 - **Hospedagem e Deploy:**
-  - [Vercel](https://vercel.com/) para o frontend
-  - [Firebase Hosting](https://firebase.google.com/products/hosting) para o backend
+
+  - [Firebase Hosting](https://firebase.google.com/products/hosting)
 
 - **Ferramentas de Desenvolvimento:**
   - [Visual Studio Code](https://code.visualstudio.com/) com extensões recomendadas para TypeScript e React
