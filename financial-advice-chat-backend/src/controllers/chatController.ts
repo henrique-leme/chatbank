@@ -41,7 +41,7 @@ export const addChatMessageFinance = async (req: Request, res: Response) => {
 
     const chatHistory = await getChatByUserId(userId, limit, null);
 
-    let context = `Esse é o Histórico das últimas perguntas do usuário com o perfil "${profileType}" e ganhos mensais de R$${income}:\n`;
+    let context = `Estas são as últimas 5 perguntas feitas por mim, que tenho um perfil financeiro "${profileType}" e ganhos mensais de R$${income}:\n`;
     if (chatHistory && chatHistory.messages.length > 0) {
       const lastFiveQuestions = chatHistory.messages
         .map((message) => `Pergunta: ${message.question}`)
@@ -52,7 +52,7 @@ export const addChatMessageFinance = async (req: Request, res: Response) => {
       context += "Nenhum histórico disponível.\n";
     }
 
-    context += `\nE esta é a pergunta atual do usuário: ${question}. Responda de forma clara e objetiva, levando em conta o que já foi perguntado, elabore a resposta de acordo com o nível informado do usuário.`;
+    context += `\nE esta é a pergunta feita agora por mim: ${question}. Responda de forma clara e objetiva apenas a ultima pergunta feita, levando em conta o que já foi perguntado, elabore a resposta de acordo com o nível informado do usuário.`;
 
     console.log(context);
 

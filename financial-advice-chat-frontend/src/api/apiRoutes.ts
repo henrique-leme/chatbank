@@ -47,6 +47,11 @@ interface ChatMessage {
   createdAt: Date;
 }
 
+type Question = {
+  question: string;
+  options: string[];
+};
+
 interface Chat {
   chatId: string;
   userId: string;
@@ -259,9 +264,19 @@ export const getFinancialLevelQuestions = async (): Promise<string> => {
 };
 
 export const evaluateFinancialLevel = async (
+  questions: Question[],
   answers: string[]
 ): Promise<void> => {
   const url = `${backendUrl}/users/evaluate-finance-level/llama`;
+
+  const formattedQuestionsAndAnswers = questions
+    .map(
+      (question, index) =>
+        `${index + 1}. ${question.question} Resposta: ${answers[index]}`
+    )
+    .join("\n");
+
+  const prompt = `${formattedQuestionsAndAnswers} Baseado nas respostas, avalie em básico ou avançado e responda apenas com o nível da pessoa e mais nada.`;
 
   try {
     const response = await fetchWithTimeout(url, {
@@ -270,7 +285,7 @@ export const evaluateFinancialLevel = async (
         "Content-Type": "application/json",
         Authorization: `Bearer ${await auth.currentUser?.getIdToken()}`,
       },
-      body: JSON.stringify({ answers }),
+      body: JSON.stringify({ prompt: prompt }),
     });
 
     if (!response.ok) {
