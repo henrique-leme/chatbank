@@ -53,7 +53,7 @@ const EvaluateProfile = () => {
   const handleSubmit = async () => {
     try {
       setSubmitLoading(true);
-      await evaluateFinancialLevel(answers);
+      await evaluateFinancialLevel(questions, answers);
       alert("Avaliação de perfil concluída com sucesso!");
     } catch (error) {
       console.error("Erro ao enviar respostas:", error);
