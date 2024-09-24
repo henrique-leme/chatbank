@@ -1,58 +1,62 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
+import {
+  onAuthStateChanged,
+  signOut as firebaseSignOut,
+  User,
+} from "firebase/auth";
 import { auth } from "../firebase";
+import { useNavigate, useLocation } from "react-router-dom";
 
 interface AuthContextType {
-  currentUser: firebase.User | null;
-  login: (
-    email: string,
-    password: string
-  ) => Promise<firebase.auth.UserCredential>;
-  signup: (
-    email: string,
-    password: string
-  ) => Promise<firebase.auth.UserCredential>;
-  logout: () => Promise<void>;
+  user: User | null;
+  loading: boolean;
+  signOut: () => void;
 }
 
-const AuthContext = React.createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = (): AuthContextType => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth deve ser usado dentro de um AuthProvider");
+  }
+  return context;
+};
 
-export const AuthProvider: React.FC = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState<firebase.User | null>(null);
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-
-  const signup = (email: string, password: string) => {
-    return auth.createUserWithEmailAndPassword(email, password);
-  };
-
-  const login = (email: string, password: string) => {
-    return auth.signInWithEmailAndPassword(email, password);
-  };
-
-  const logout = () => {
-    return auth.signOut();
-  };
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      setCurrentUser(user);
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      setUser(firebaseUser);
       setLoading(false);
+
+      const isPublicRoute = ["/login", "/register"].includes(location.pathname);
+
+      if (!firebaseUser && !isPublicRoute && !loading) {
+        navigate("/login");
+      }
     });
 
-    return unsubscribe;
-  }, []);
+    return () => unsubscribe();
+  }, [navigate, location.pathname, loading]);
 
-  const value: AuthContextType = {
-    currentUser,
-    login,
-    signup,
-    logout,
+  const signOut = () => {
+    firebaseSignOut(auth).then(() => {
+      setUser(null);
+      navigate("/login");
+    });
   };
 
   return (
-    <AuthContext.Provider value={value}>
-      {!loading && children}
+    <AuthContext.Provider value={{ user, loading, signOut }}>
+      {!loading && children}{" "}
+      {/* Renderiza os filhos apenas quando o carregamento termina */}
     </AuthContext.Provider>
   );
 };
