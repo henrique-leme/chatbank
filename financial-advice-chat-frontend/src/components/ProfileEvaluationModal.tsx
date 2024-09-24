@@ -21,7 +21,8 @@ const ProfileEvaluationModal: React.FC<ProfileEvaluationModalProps> = ({
         <div className="p-6 text-center">
           <h2 className="text-xl font-bold mb-4">Avaliação de Perfil</h2>
           <p className="mb-6">
-            Seu perfil é básico. Deseja realizar a avaliação para aprimorá-lo?
+            Seu perfil é <strong>básico</strong>. Deseja realizar a avaliação
+            para aprimorá-lo?
           </p>
           <div className="flex justify-center space-x-4">
             <button
