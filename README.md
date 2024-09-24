@@ -21,7 +21,6 @@ Financial Advice Chat é um serviço abrangente desenvolvido para fornecer acons
 ### ⚙️ Funcionalidades
 
 - **Frontend:**
-
   - Interface de Usuário para Conversas Financeiras
   - Integração com Backend via API REST
   - Design Responsivo
@@ -147,7 +146,6 @@ Certifique-se de ter instalado:
 ## 🛠️ Construído com
 
 - **Frontend:**
-
   - [React](https://reactjs.org/) - Biblioteca para construção de interfaces de usuário
   - [TypeScript](https://www.typescriptlang.org/) - Linguagem de programação
   - [Vite](https://vitejs.dev/) - Ferramenta de build
@@ -158,7 +156,6 @@ Certifique-se de ter instalado:
   - [Zod](https://zod.dev/) - Validação de esquemas
 
 - **Backend:**
-
   - [Node.js](https://nodejs.org/) - Ambiente de execução
   - [Express](https://expressjs.com/) - Framework web
   - [TypeScript](https://www.typescriptlang.org/) - Linguagem de programação
@@ -185,11 +182,9 @@ Este projeto está licenciado sob a licença MIT - veja o arquivo [LICENSE](LICE
 ## 🎯 Conceitos e Arquitetura
 
 - **Padrões de Design:**
-
   - **MVC (Model-View-Controller)**
 
 - **Conceitos de Arquitetura:**
-
   - **Arquitetura em Camadas** (Apresentação, Aplicação/Backend, Dados, Infraestrutura)
   - **Autenticação e Autorização com JWT**
   - **Integração de IA usando Ollama**
@@ -206,7 +201,6 @@ Este projeto está licenciado sob a licença MIT - veja o arquivo [LICENSE](LICE
 ## 📌 Notas Adicionais
 
 - **Hospedagem e Deploy:**
-
   - [Vercel](https://vercel.com/) para o frontend
   - [Firebase Hosting](https://firebase.google.com/products/hosting) para o backend
 
