@@ -10,9 +10,18 @@ type Question = {
   options: string[];
 };
 
+const normalizeText = (text: string): string => {
+  return text.replace(/\r\n/g, "\n").replace(/\n\n+/g, "\n").trim();
+};
+
 const extractQuestions = (text: string): Question[] => {
-  const regex = /\d+\.\s(.+?)\n(Sim \/ Não)/g;
-  const matches = [...text.matchAll(regex)];
+  const normalizedText = normalizeText(text);
+  const regex = /\d+\.\s(.+?)(?:\n|$).*?(Sim\s*(\/|ou)\s*Não)/gi;
+  const matches = [...normalizedText.matchAll(regex)];
+
+  if (matches.length === 0) {
+    throw new Error("Nenhuma pergunta encontrada no texto fornecido.");
+  }
 
   return matches.map((match) => ({
     question: match[1].trim(),
@@ -34,6 +43,8 @@ const EvaluateProfile = () => {
         const response = await getFinancialLevelQuestions();
         const extractedQuestions = extractQuestions(response);
         setQuestions(extractedQuestions);
+        setCurrentStep(0);
+        setAnswers([]);
       } catch (error) {
         console.error("Erro ao carregar perguntas:", error);
         alert("Erro ao carregar perguntas, tente novamente.");
@@ -46,8 +57,14 @@ const EvaluateProfile = () => {
   }, []);
 
   const handleAnswer = (answer: string) => {
-    setAnswers([...answers, answer]);
+    const updatedAnswers = [...answers];
+    updatedAnswers[currentStep] = answer;
+    setAnswers(updatedAnswers);
     setCurrentStep(currentStep + 1);
+  };
+
+  const handleReview = (index: number) => {
+    setCurrentStep(index);
   };
 
   const handleSubmit = async () => {
@@ -95,10 +112,29 @@ const EvaluateProfile = () => {
             </div>
           </div>
         ) : (
-          <div className="w-full max-w-md bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 text-center">
-            <h3 className="text-lg mb-6">Avaliação concluída! Obrigado!</h3>
+          <div className="w-full max-w-md bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+            <h3 className="text-lg mb-6 text-center">
+              Avaliação concluída! Por favor, revise suas respostas antes de
+              enviar.
+            </h3>
+            <div className="mb-4">
+              {questions.map((q, index) => (
+                <div key={index} className="mb-2">
+                  <p className="font-semibold">{`${index + 1}. ${
+                    q.question
+                  }`}</p>
+                  <p>Sua resposta: {answers[index]}</p>
+                  <button
+                    className="text-blue-600 hover:underline"
+                    onClick={() => handleReview(index)}
+                  >
+                    Alterar resposta
+                  </button>
+                </div>
+              ))}
+            </div>
             <button
-              className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded w-full"
+              className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded w-full mb-2"
               onClick={handleSubmit}
               disabled={submitLoading}
             >

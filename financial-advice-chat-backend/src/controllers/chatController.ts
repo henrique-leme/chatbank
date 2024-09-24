@@ -12,7 +12,11 @@ export const getFinancialLevelQuestions = async (
   res: Response
 ) => {
   try {
-    const prompt = `Elabore 6 perguntas de forma enumerada, para poder avaliar se o nível de conhecimento financeiro no Brasil de uma pessoa é básico ou avançado, as perguntas devem ser de Sim e Não`;
+    const prompt = `Elabore 6 perguntas enumeradas para avaliar se o nível de conhecimento financeiro de uma pessoa no Brasil é básico ou avançado. As perguntas devem ser de "Sim" ou "Não" e apresentadas no seguinte formato:
+1. Pergunta?
+Resposta: Sim ou Não
+
+Não inclua explicações adicionais ou comentários.`;
 
     const aiResponse = await processLlamaModel(prompt);
 
