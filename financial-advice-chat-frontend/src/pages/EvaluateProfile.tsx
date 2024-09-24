@@ -1,3 +1,4 @@
+// Importações necessárias
 import { useEffect, useState } from "react";
 import {
   getFinancialLevelQuestions,
@@ -35,6 +36,7 @@ const EvaluateProfile = () => {
   const [answers, setAnswers] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitLoading, setSubmitLoading] = useState(false);
+  const [userProfile, setUserProfile] = useState<string | null>(null);
 
   useEffect(() => {
     const loadQuestions = async () => {
@@ -70,8 +72,9 @@ const EvaluateProfile = () => {
   const handleSubmit = async () => {
     try {
       setSubmitLoading(true);
-      await evaluateFinancialLevel(questions, answers);
-      alert("Avaliação de perfil concluída com sucesso!");
+      const response = await evaluateFinancialLevel(questions, answers);
+      // Supondo que a resposta seja um objeto com "profileType" e "aiResponse"
+      setUserProfile(response.aiResponse || response.profileType);
     } catch (error) {
       console.error("Erro ao enviar respostas:", error);
       alert("Erro ao enviar respostas.");
@@ -81,12 +84,12 @@ const EvaluateProfile = () => {
   };
 
   return (
-    <div className="flex flex-col sm:flex-row h-screen">
+    <div className="flex flex-col sm:flex-row h-screen overflow-hidden">
       {/* Sidebar */}
       <Sidebar />
 
       {/* Conteúdo principal */}
-      <div className="flex-grow bg-gray-200 p-4 sm:p-8 flex flex-col items-center">
+      <div className="flex-grow bg-gray-200 p-4 sm:p-8 flex flex-col items-center overflow-auto">
         <h2 className="text-2xl font-bold mb-6 text-center">
           Avaliação de Perfil Financeiro
         </h2>
@@ -94,8 +97,18 @@ const EvaluateProfile = () => {
           <div className="text-center">
             <h2 className="text-xl font-bold">Carregando perguntas...</h2>
           </div>
+        ) : userProfile ? (
+          <div className="w-full max-w-md bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 text-center">
+            <h3 className="text-lg mb-6">Obrigado por concluir a avaliação!</h3>
+            <p className="text-xl font-bold">
+              Seu perfil financeiro é: {userProfile}
+            </p>
+          </div>
         ) : currentStep < questions.length ? (
-          <div className="w-full max-w-md bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+          <div
+            className="w-full max-w-md bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 overflow-y-auto"
+            style={{ maxHeight: "80vh" }}
+          >
             <div className="text-lg mb-6 text-center">
               {questions[currentStep].question}
             </div>
@@ -112,14 +125,17 @@ const EvaluateProfile = () => {
             </div>
           </div>
         ) : (
-          <div className="w-full max-w-md bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+          <div
+            className="w-full max-w-md bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 overflow-y-auto"
+            style={{ maxHeight: "80vh" }}
+          >
             <h3 className="text-lg mb-6 text-center">
               Avaliação concluída! Por favor, revise suas respostas antes de
               enviar.
             </h3>
             <div className="mb-4">
               {questions.map((q, index) => (
-                <div key={index} className="mb-2">
+                <div key={index} className="mb-4">
                   <p className="font-semibold">{`${index + 1}. ${
                     q.question
                   }`}</p>

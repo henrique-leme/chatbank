@@ -266,7 +266,7 @@ export const getFinancialLevelQuestions = async (): Promise<string> => {
 export const evaluateFinancialLevel = async (
   questions: Question[],
   answers: string[]
-): Promise<void> => {
+): Promise<{ profileType: string; aiResponse: string }> => {
   const url = `${backendUrl}/users/evaluate-finance-level/llama`;
 
   const formattedQuestionsAndAnswers = questions
@@ -294,6 +294,10 @@ export const evaluateFinancialLevel = async (
         errorData?.message || "Falha ao avaliar o nível financeiro.";
       throw new Error(errorMessage);
     }
+
+    // Parse da resposta da API
+    const data = await response.json();
+    return data; // Supondo que data é um objeto com "profileType" e "aiResponse"
   } catch (error) {
     console.error("Erro ao avaliar o nível financeiro:", error);
     throw error;
