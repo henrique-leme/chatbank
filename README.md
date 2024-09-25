@@ -30,8 +30,7 @@ Financial Advice Chat é um serviço abrangente desenvolvido para fornecer acons
 
 - **Backend:**
   - Autenticação e Autorização de Usuários com JWT
-  - Gestão de Transações Financeiras
-  - Armazenamento Seguro com MongoDB
+  - Armazenamento Seguro e Realtime com Firestore
   - API RESTful
   - Integração com Modelos de IA via Ollama
 
