@@ -49,7 +49,7 @@ const translateWithLibreTranslate = async (text: string): Promise<string> => {
       );
       translatedBlocks.push(response.data.translatedText);
     }
-    //
+
     return translatedBlocks.join(" ");
   } catch (error) {
     console.error(

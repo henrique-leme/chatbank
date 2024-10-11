@@ -61,6 +61,7 @@ export const addChatMessageFinance = async (req: Request, res: Response) => {
     console.log(context);
 
     const aiResponse = await processFinanceModel(context);
+    console.log("Realizou a chamada para a IA");
 
     await addMessageToChat(userId, question, aiResponse);
 
@@ -73,7 +74,7 @@ export const addChatMessageFinance = async (req: Request, res: Response) => {
 export const getChatHistory = async (req: Request, res: Response) => {
   const userId = (req as any).user.uid;
   const { limit = 10, startAfter } = req.query;
-
+  console.log("Realizou get de History");
   try {
     const chat = await getChatByUserId(
       userId,

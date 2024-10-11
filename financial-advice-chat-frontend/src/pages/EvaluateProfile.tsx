@@ -1,4 +1,3 @@
-// Importações necessárias
 import { useEffect, useState } from "react";
 import {
   getFinancialLevelQuestions,
@@ -73,7 +72,6 @@ const EvaluateProfile = () => {
     try {
       setSubmitLoading(true);
       const response = await evaluateFinancialLevel(questions, answers);
-      // Supondo que a resposta seja um objeto com "profileType" e "aiResponse"
       setUserProfile(response.aiResponse || response.profileType);
     } catch (error) {
       console.error("Erro ao enviar respostas:", error);

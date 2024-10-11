@@ -46,6 +46,7 @@ export const updateUserProfile = async (req: Request, res: Response) => {
 };
 
 export const createUserProfile = async (req: Request, res: Response) => {
+  console.log("Criando usuário...");
   try {
     const userData = userInputSchema.parse(req.body);
     await createUser(userData);

@@ -1,27 +1,31 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginUser } from "../api/apiRoutes";
+
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async () => {
     setIsLoading(true);
-    setErrorMessage("");
-
+    setErrorMessage(null);
     try {
       const response = await loginUser({ email, password });
 
       console.log("Usuário autenticado:", response.user);
 
       navigate("/chat");
-    } catch (error) {
-      setErrorMessage(
-        "Falha ao tentar fazer login. Verifique suas credenciais."
-      );
+    } catch (error: any) {
+      if (error instanceof Error) {
+        setErrorMessage(error.message);
+      } else {
+        setErrorMessage(
+          "Falha ao tentar fazer login. Verifique suas credenciais."
+        );
+      }
       console.error("Falha no login:", error);
     } finally {
       setIsLoading(false);
@@ -37,6 +41,7 @@ const Login = () => {
       <div className="w-full max-w-sm bg-white shadow-md rounded-lg p-6">
         <h2 className="text-center text-2xl font-bold mb-6">Login</h2>
         <form className="space-y-4">
+          {/* Campo de E-mail */}
           <div>
             <label
               htmlFor="email"
@@ -54,6 +59,8 @@ const Login = () => {
               required
             />
           </div>
+
+          {/* Campo de Senha */}
           <div>
             <label
               htmlFor="password"

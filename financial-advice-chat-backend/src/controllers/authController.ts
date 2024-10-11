@@ -5,7 +5,7 @@ import admin from "firebase-admin";
 
 export const loginUser = async (req: Request, res: Response) => {
   const { email, password } = req.body;
-
+  console.log("Fazendo login...");
   try {
     const user = await getUserByEmail(email);
 

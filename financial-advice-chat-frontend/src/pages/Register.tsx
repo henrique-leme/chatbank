@@ -10,8 +10,18 @@ const registerSchema = z
     email: z.string().email("E-mail inválido"),
     password: z.string().min(6, "A senha deve ter pelo menos 6 caracteres"),
     confirmPassword: z.string(),
-    age: z.number().positive("Idade deve ser um número positivo"),
-    income: z.number().nonnegative("Renda deve ser um número não negativo"),
+    age: z
+      .number({
+        required_error: "Idade é obrigatória",
+        invalid_type_error: "Idade deve ser um número",
+      })
+      .positive("Idade deve ser um número positivo"),
+    income: z
+      .number({
+        required_error: "Renda é obrigatória",
+        invalid_type_error: "Renda deve ser um número",
+      })
+      .nonnegative("Renda deve ser um número não negativo"),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "As senhas não coincidem",
@@ -26,14 +36,16 @@ const Register = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [age, setAge] = useState<number | "">("");
   const [income, setIncome] = useState<number | "">("");
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [apiError, setApiError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleRegister = async () => {
     try {
       setIsLoading(true);
-      setErrorMessage(null);
+      setErrors({});
+      setApiError(null);
 
       registerSchema.parse({
         name,
@@ -41,8 +53,8 @@ const Register = () => {
         email,
         password,
         confirmPassword,
-        age,
-        income,
+        age: age === "" ? undefined : age,
+        income: income === "" ? undefined : income,
       });
 
       const registerData: RegisterData = {
@@ -66,10 +78,19 @@ const Register = () => {
         throw new Error("Login falhou.");
       }
     } catch (error: any) {
-      console.error("Erro ao registrar:", error);
-      setErrorMessage(
-        error.message || "Erro ao registrar. Por favor, revise seus dados."
-      );
+      if (error instanceof z.ZodError) {
+        const fieldErrors: { [key: string]: string } = {};
+        error.errors.forEach((err) => {
+          const field = err.path[0];
+          fieldErrors[field] = err.message;
+        });
+        setErrors(fieldErrors);
+      } else {
+        console.error("Erro ao registrar:", error);
+        setApiError(
+          error.message || "Erro ao registrar. Por favor, revise seus dados."
+        );
+      }
     } finally {
       setIsLoading(false);
     }
@@ -90,13 +111,18 @@ const Register = () => {
             </label>
             <input
               id="name"
-              className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              className={`mt-1 block w-full p-2 border ${
+                errors.name ? "border-red-500" : "border-gray-300"
+              } rounded-md focus:ring-blue-500 focus:border-blue-500`}
               type="text"
               placeholder="Digite seu nome"
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
             />
+            {errors.name && (
+              <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+            )}
           </div>
 
           {/* Sobrenome */}
@@ -109,13 +135,18 @@ const Register = () => {
             </label>
             <input
               id="secondName"
-              className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              className={`mt-1 block w-full p-2 border ${
+                errors.secondName ? "border-red-500" : "border-gray-300"
+              } rounded-md focus:ring-blue-500 focus:border-blue-500`}
               type="text"
               placeholder="Digite seu sobrenome"
               value={secondName}
               onChange={(e) => setSecondName(e.target.value)}
               required
             />
+            {errors.secondName && (
+              <p className="text-red-500 text-sm mt-1">{errors.secondName}</p>
+            )}
           </div>
 
           {/* E-mail */}
@@ -128,13 +159,18 @@ const Register = () => {
             </label>
             <input
               id="email"
-              className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              className={`mt-1 block w-full p-2 border ${
+                errors.email ? "border-red-500" : "border-gray-300"
+              } rounded-md focus:ring-blue-500 focus:border-blue-500`}
               type="email"
               placeholder="Digite seu e-mail"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
             />
+            {errors.email && (
+              <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+            )}
           </div>
 
           {/* Senha */}
@@ -147,13 +183,18 @@ const Register = () => {
             </label>
             <input
               id="password"
-              className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              className={`mt-1 block w-full p-2 border ${
+                errors.password ? "border-red-500" : "border-gray-300"
+              } rounded-md focus:ring-blue-500 focus:border-blue-500`}
               type="password"
               placeholder="Digite sua senha"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
             />
+            {errors.password && (
+              <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+            )}
           </div>
 
           {/* Confirmar Senha */}
@@ -166,13 +207,20 @@ const Register = () => {
             </label>
             <input
               id="confirmPassword"
-              className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              className={`mt-1 block w-full p-2 border ${
+                errors.confirmPassword ? "border-red-500" : "border-gray-300"
+              } rounded-md focus:ring-blue-500 focus:border-blue-500`}
               type="password"
               placeholder="Confirme sua senha"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
             />
+            {errors.confirmPassword && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.confirmPassword}
+              </p>
+            )}
           </div>
 
           {/* Idade */}
@@ -185,13 +233,18 @@ const Register = () => {
             </label>
             <input
               id="age"
-              className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              className={`mt-1 block w-full p-2 border ${
+                errors.age ? "border-red-500" : "border-gray-300"
+              } rounded-md focus:ring-blue-500 focus:border-blue-500`}
               type="number"
               placeholder="Digite sua idade"
               value={age}
               onChange={(e) => setAge(Number(e.target.value))}
               required
             />
+            {errors.age && (
+              <p className="text-red-500 text-sm mt-1">{errors.age}</p>
+            )}
           </div>
 
           {/* Renda */}
@@ -204,18 +257,22 @@ const Register = () => {
             </label>
             <input
               id="income"
-              className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              className={`mt-1 block w-full p-2 border ${
+                errors.income ? "border-red-500" : "border-gray-300"
+              } rounded-md focus:ring-blue-500 focus:border-blue-500`}
               type="number"
               placeholder="Digite sua renda"
               value={income}
               onChange={(e) => setIncome(Number(e.target.value))}
               required
             />
+            {errors.income && (
+              <p className="text-red-500 text-sm mt-1">{errors.income}</p>
+            )}
           </div>
 
-          {errorMessage && (
-            <p className="text-red-500 text-sm mt-2">{errorMessage}</p>
-          )}
+          {/* Erro Geral de API */}
+          {apiError && <p className="text-red-500 text-sm mt-2">{apiError}</p>}
 
           <div className="flex flex-col space-y-4 mt-4">
             <button
