@@ -101,8 +101,6 @@ const handleResponse = async (response: Response) => {
   } else {
     data = await response.text();
   }
-  console.log("data: " + data);
-  console.log("response: " + response);
   if (!response.ok) {
     const errorMessage = data || "Ocorreu um erro na requisição.";
     throw new Error(errorMessage);
@@ -132,7 +130,10 @@ export const loginUser = async (
 
     const data: BackendLoginResponse = await handleResponse(response);
 
-    await signInWithCustomToken(auth, data.token);
+    const authResponse = await signInWithCustomToken(auth, data.token);
+
+    data.token = await authResponse.user.getIdToken();
+
     return data;
   } catch (error: any) {
     console.error("Erro durante o login:", error);

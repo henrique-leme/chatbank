@@ -7,14 +7,16 @@ export const authMiddleware = async (
   res: Response,
   next: NextFunction
 ) => {
-  const token = req.headers.authorization?.split(" ")[1];
-  console.log("Token Recebido:", token);
-  if (!token)
+  const rawToken = req.headers.authorization?.split(" ")[1] || "";
+  const token = rawToken.trim();
+
+  if (!token) {
     return res.status(401).send("Acesso negado. Token não fornecido.");
+  }
 
   try {
     const decodedToken = await admin.auth().verifyIdToken(token);
-    console.log("Decoded Token:", decodedToken);
+
     (req as any).user = decodedToken;
     next();
   } catch (error) {

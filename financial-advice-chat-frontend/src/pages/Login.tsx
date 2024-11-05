@@ -15,9 +15,12 @@ const Login = () => {
     try {
       const response = await loginUser({ email, password });
 
-      console.log("Usuário autenticado:", response.user);
-
-      navigate("/chat");
+      if (response.token) {
+        localStorage.setItem("authToken", response.token);
+        navigate("/chat", { state: { showEvaluationModal: true } });
+      } else {
+        throw new Error("Login falhou.");
+      }
     } catch (error: any) {
       if (error instanceof Error) {
         setErrorMessage(error.message);

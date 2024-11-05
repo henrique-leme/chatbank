@@ -75,7 +75,7 @@ const Register = () => {
         localStorage.setItem("authToken", loginResponse.token);
         navigate("/chat", { state: { showEvaluationModal: true } });
       } else {
-        throw new Error("Login falhou.");
+        throw new Error("Login após registro falhou.");
       }
     } catch (error: any) {
       if (error instanceof z.ZodError) {
