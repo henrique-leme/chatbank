@@ -13,8 +13,10 @@ export const authMiddleware = async (
   if (!token) {
     return res.status(401).send("Acesso negado. Token não fornecido.");
   }
+  console.log("Token Recebido no Middleware do Backend:", token);
 
   try {
+
     const decodedToken = await admin.auth().verifyIdToken(token);
 
     (req as any).user = decodedToken;

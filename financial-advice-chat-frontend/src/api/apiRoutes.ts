@@ -130,7 +130,9 @@ export const loginUser = async (
 
     const data: BackendLoginResponse = await handleResponse(response);
 
+    console.log("Custom Token Recebido do Backend:", data.token);
     const authResponse = await signInWithCustomToken(auth, data.token);
+    console.log("Token Gerado pelo Front SDK:", authResponse.user.getIdToken());
 
     data.token = await authResponse.user.getIdToken();
 
@@ -175,6 +177,7 @@ export const getChatHistory = async (): Promise<Chat> => {
 
   try {
     const token = await auth.currentUser?.getIdToken();
+    console.log("Token usado para o chatHistory:", token);
     if (!token) {
       throw new Error("Usuário não autenticado.");
     }
@@ -217,6 +220,7 @@ export const sendMessage = async (
 
   try {
     const token = await auth.currentUser?.getIdToken();
+    console.log("Token usado para o sendMessage:", token);
     if (!token) {
       throw new Error("Usuário não autenticado.");
     }
@@ -248,6 +252,7 @@ export const getUserProfile = async (uid: string): Promise<UserProfile> => {
 
   try {
     const token = await auth.currentUser?.getIdToken();
+    console.log("Token usado para o getUserProfile:", token);
     if (!token) {
       throw new Error("Usuário não autenticado.");
     }
@@ -284,6 +289,7 @@ export const getFinancialLevelQuestions = async (): Promise<string> => {
 
   try {
     const token = await auth.currentUser?.getIdToken();
+    console.log("Token usado para o getFinancialLevelQuestions:", token);
     if (!token) {
       throw new Error("Usuário não autenticado.");
     }
@@ -329,6 +335,7 @@ export const evaluateFinancialLevel = async (
 
   try {
     const token = await auth.currentUser?.getIdToken();
+    console.log("Token usado para o evaluateFinancialLevel:", token);
     if (!token) {
       throw new Error("Usuário não autenticado.");
     }
@@ -365,6 +372,7 @@ export const updateUserProfile = async (
 
   try {
     const token = await auth.currentUser?.getIdToken();
+    console.log("Token usado para o updateUserProfile:", token);
     if (!token) {
       throw new Error("Usuário não autenticado.");
     }

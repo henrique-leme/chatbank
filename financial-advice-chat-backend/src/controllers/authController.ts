@@ -21,6 +21,8 @@ export const loginUser = async (req: Request, res: Response) => {
 
     const customToken = await admin.auth().createCustomToken(user.id);
 
+    console.log("Custom Token Gerado para Logar no Front SDK:", customToken);
+
     res.status(200).json({ token: customToken, user });
   } catch (error) {
     console.error("Erro ao fazer login:", error);
