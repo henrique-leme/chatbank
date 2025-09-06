@@ -6,6 +6,9 @@ import Sidebar from "../components/SideBar";
 import { useLocation, useNavigate } from "react-router-dom";
 import ProfileEvaluationModal from "../components/ProfileEvaluationModal";
 import ChatMessages from "../components/ChatMessages";
+import { useAnalytics } from "../hooks/useAnalytics";
+import SessionStats from "../components/SessionStats";
+import AnalyticsDebug from "../components/AnalyticsDebug";
 
 interface Message {
   sender: "user" | "bot";
@@ -35,9 +38,21 @@ const Chat = () => {
   const [isAssistantTyping, setIsAssistantTyping] = useState(false);
 
   const [showEvaluationModal, setShowEvaluationModal] = useState(false);
+  const [showSessionStats, setShowSessionStats] = useState(false);
 
   const location = useLocation();
   const navigate = useNavigate();
+
+  // Analytics hook
+  const {
+    startChatbotSession,
+    endChatbotSession,
+    trackMessage,
+    trackResponse,
+    trackUserError,
+    getCurrentSessionDuration,
+    isSessionActive,
+  } = useAnalytics();
 
   useEffect(() => {
     if (location.state?.showEvaluationModal) {
@@ -79,11 +94,15 @@ const Chat = () => {
           setUserProfile(profileData);
           setLoadingProfile(false);
 
+          // Iniciar sessão do chatbot com analytics
+          startChatbotSession(profileData.profileType);
+
           if (profileData.profileType === "basic") {
             setShowEvaluationModal(true);
           }
         } catch (error) {
           console.error("Erro ao carregar histórico de chat ou perfil:", error);
+          trackUserError("chat_load_error", error.toString());
           setLoadingMessages(false);
           setLoadingProfile(false);
         }
@@ -99,7 +118,11 @@ const Chat = () => {
         setIsSending(true);
         setIsAssistantTyping(true);
 
+        const startTime = Date.now();
         const nowIsoString = new Date().toISOString();
+
+        // Rastrear mensagem enviada
+        trackMessage(newMessage);
 
         const userMessage: Message = {
           sender: "user",
@@ -111,6 +134,10 @@ const Chat = () => {
         setNewMessage("");
 
         const response = await sendMessage(newMessage);
+        const responseTime = Date.now() - startTime;
+
+        // Rastrear resposta recebida
+        trackResponse(response.answer, responseTime);
 
         const botMessage: Message = {
           sender: "bot",
@@ -121,6 +148,7 @@ const Chat = () => {
         setMessages((prevMessages) => [...prevMessages, botMessage]);
       } catch (error) {
         console.error("Erro ao enviar a mensagem:", error);
+        trackUserError("message_send_error", error.toString());
       } finally {
         setIsAssistantTyping(false);
         setIsSending(false);
@@ -133,12 +161,18 @@ const Chat = () => {
       <Sidebar />
 
       <div className="flex flex-col flex-grow bg-gray-200 relative">
-        <div className="sm:hidden p-4">
+        <div className="sm:hidden p-4 flex gap-2">
           <button
             onClick={() => setShowProfile(!showProfile)}
             className="text-white bg-blue-600 hover:bg-blue-700 font-medium rounded-lg text-sm px-4 py-2"
           >
             {showProfile ? "Fechar Perfil" : "Mostrar Perfil"}
+          </button>
+          <button
+            onClick={() => setShowSessionStats(!showSessionStats)}
+            className="text-white bg-green-600 hover:bg-green-700 font-medium rounded-lg text-sm px-4 py-2"
+          >
+            {showSessionStats ? "Ocultar Stats" : "Mostrar Stats"}
           </button>
         </div>
 
@@ -192,6 +226,13 @@ const Chat = () => {
             }}
           />
         )}
+
+        <SessionStats
+          isVisible={showSessionStats}
+          onClose={() => setShowSessionStats(false)}
+        />
+
+        <AnalyticsDebug />
       </div>
     </div>
   );

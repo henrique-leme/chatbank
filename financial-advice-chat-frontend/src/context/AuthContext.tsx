@@ -6,6 +6,7 @@ import {
 } from "firebase/auth";
 import { auth } from "../firebase";
 import { useNavigate, useLocation } from "react-router-dom";
+import { trackLogin, trackLogout, setUserId } from "../config/analytics";
 
 interface AuthContextType {
   user: User | null;
@@ -36,6 +37,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       setUser(firebaseUser);
       setLoading(false);
 
+      // Rastrear login/logout e configurar User ID
+      if (firebaseUser) {
+        setUserId(firebaseUser.uid);
+        trackLogin(firebaseUser.uid, 'firebase');
+      }
+
       const isPublicRoute = ["/login", "/register"].includes(location.pathname);
 
       if (!firebaseUser && !isPublicRoute && !loading) {
@@ -47,6 +54,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [navigate, location.pathname, loading]);
 
   const signOut = () => {
+    // Rastrear logout antes de deslogar
+    if (user) {
+      trackLogout(user.uid);
+    }
+
     firebaseSignOut(auth).then(() => {
       setUser(null);
       navigate("/login");

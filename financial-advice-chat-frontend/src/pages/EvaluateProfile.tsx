@@ -4,6 +4,8 @@ import {
   evaluateFinancialLevel,
 } from "../api/apiRoutes";
 import Sidebar from "../components/SideBar";
+import { useAnalytics } from "../hooks/useAnalytics";
+import { useAuth } from "../context/AuthContext";
 
 type Question = {
   question: string;
@@ -30,6 +32,8 @@ const extractQuestions = (text: string): Question[] => {
 };
 
 const EvaluateProfile = () => {
+  const { user } = useAuth();
+  const { trackUserError, trackProfileEvaluation } = useAnalytics();
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState<string[]>([]);
@@ -48,6 +52,7 @@ const EvaluateProfile = () => {
         setAnswers([]);
       } catch (error) {
         console.error("Erro ao carregar perguntas:", error);
+        trackUserError("questions_load_error", error.toString());
         alert("Erro ao carregar perguntas, tente novamente.");
       } finally {
         setLoading(false);
@@ -72,9 +77,17 @@ const EvaluateProfile = () => {
     try {
       setSubmitLoading(true);
       const response = await evaluateFinancialLevel(questions, answers);
-      setUserProfile(response.aiResponse || response.profileType);
+      const profileType = response.aiResponse || response.profileType;
+      setUserProfile(profileType);
+
+      // Rastrear avaliação de perfil
+      if (user) {
+        const score = answers.filter(answer => answer === 'Sim').length;
+        trackProfileEvaluation(user.uid, 'financial_level', score);
+      }
     } catch (error) {
       console.error("Erro ao enviar respostas:", error);
+      trackUserError("evaluation_submit_error", error.toString());
       alert("Erro ao enviar respostas.");
     } finally {
       setSubmitLoading(false);
