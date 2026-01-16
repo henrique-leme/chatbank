@@ -9,6 +9,7 @@ import {
   trackLogin,
   trackLogout,
   trackError,
+  trackProfileEvaluation as trackProfileEvaluationGA,
   ChatbotSessionTracker,
 } from '../config/analytics';
 
@@ -94,6 +95,11 @@ export const useAnalytics = () => {
     }
   };
 
+  // Rastrear avaliação de perfil
+  const trackProfileEvaluation = (userId: string, evaluationType: string, score: number) => {
+    trackProfileEvaluationGA(userId, evaluationType, score);
+  };
+
   // Obter tempo atual da sessão
   const getCurrentSessionDuration = () => {
     if (sessionTrackerRef.current) {
@@ -119,6 +125,7 @@ export const useAnalytics = () => {
     trackUserLogin,
     trackUserLogout,
     trackUserError,
+    trackProfileEvaluation,
     getCurrentSessionDuration,
     isSessionActive,
   };

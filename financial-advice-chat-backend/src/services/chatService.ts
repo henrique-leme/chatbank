@@ -19,6 +19,22 @@ export const processLlamaModel = async (question: string): Promise<string> => {
   }
 };
 
+const isPortuguese = (text: string): boolean => {
+  const portugueseWords = [
+    'você', 'não', 'são', 'está', 'esse', 'essa', 'isso', 'como', 'para',
+    'que', 'uma', 'seu', 'sua', 'mais', 'também', 'pode', 'deve', 'fazer',
+    'dinheiro', 'investimento', 'financeiro', 'renda', 'conta', 'banco',
+    'quando', 'porque', 'então', 'ainda', 'pelo', 'pela', 'seus', 'suas',
+    'sobre', 'após', 'entre', 'cada', 'muito', 'outro', 'outra', 'mesmo'
+  ];
+
+  const lowerText = text.toLowerCase();
+  const matches = portugueseWords.filter(word => lowerText.includes(word));
+
+  // Se tiver 3+ palavras portuguesas, considera portugues
+  return matches.length >= 3;
+};
+
 export const processFinanceModel = async (
   question: string
 ): Promise<string> => {
@@ -31,6 +47,14 @@ export const processFinanceModel = async (
     console.log(response);
 
     const aiResponse = response.data.message.content.trim();
+
+    // Detectar se ja esta em portugues
+    if (isPortuguese(aiResponse)) {
+      console.log("Resposta ja em portugues, pulando traducao");
+      return aiResponse;
+    }
+
+    console.log("Resposta em ingles, traduzindo para portugues");
     const translatedResponse = await translateTextToPortuguese(aiResponse);
 
     return translatedResponse;

@@ -14,7 +14,7 @@ import {
   userUpdateSchema,
 } from "../models/userSchema";
 import { z } from "zod";
-import { processLlamaModel } from "../services/chatService";
+import { INVERTED_QUESTION_IDS } from "../constants/evaluationQuestions";
 
 export const getUserProfile = async (req: Request, res: Response) => {
   const uid = (req as any).user.uid;
@@ -108,24 +108,52 @@ export const deleteUserProfile = async (req: Request, res: Response) => {
   }
 };
 
+interface EvaluationAnswer {
+  questionId: number;
+  answer: "Sim" | "Não" | "Não Sei";
+}
+
 export const evaluateFinancialLevel = async (req: Request, res: Response) => {
   const userId = (req as any).user.uid;
 
   try {
-    const { prompt } = req.body;
-    if (!prompt) {
-      return res.status(400).send("O prompt é obrigatório.");
+    const { answers } = req.body as { answers: EvaluationAnswer[] };
+
+    if (!answers || !Array.isArray(answers)) {
+      return res.status(400).send("Respostas são obrigatórias.");
     }
 
-    const aiResponse = await processLlamaModel(prompt);
+    // Filtrar respostas validas (excluir "Não Sei")
+    const validAnswers = answers.filter(a => a.answer !== "Não Sei");
 
-    const profileType = aiResponse.toLowerCase().includes("avançado")
-      ? "advanced"
-      : "basic";
+    // Contar respostas "Sim" considerando perguntas invertidas
+    const simCount = validAnswers.filter(a => {
+      const isInverted = INVERTED_QUESTION_IDS.includes(a.questionId);
+      // Para perguntas invertidas, "Não" conta como positivo
+      if (isInverted) {
+        return a.answer === "Não";
+      }
+      return a.answer === "Sim";
+    }).length;
+
+    const totalValid = validAnswers.length;
+
+    // Calcular percentual (evitar divisao por zero)
+    const percentage = totalValid > 0 ? (simCount / totalValid) * 100 : 0;
+
+    // Classificar: >= 50% = advanced, < 50% = basic
+    const profileType = percentage >= 50 ? "advanced" : "basic";
 
     await updateUserProfileType(userId, profileType);
 
-    res.json({ profileType, aiResponse });
+    res.json({
+      profileType,
+      score: {
+        simCount,
+        totalAnswered: totalValid,
+        percentage: Math.round(percentage)
+      }
+    });
   } catch (error) {
     res.status(500).send(`Erro ao avaliar o nível financeiro: ${error}`);
   }

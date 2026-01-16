@@ -3,26 +3,21 @@ import {
   addMessageToChat,
   getChatByUserId,
   processFinanceModel,
-  processLlamaModel,
 } from "../services/chatService";
 import { getUserById } from "../services/userService";
+import { EVALUATION_QUESTIONS, QUESTION_OPTIONS } from "../constants/evaluationQuestions";
 
 export const getFinancialLevelQuestions = async (
   req: Request,
   res: Response
 ) => {
   try {
-    const prompt = `Elabore 6 perguntas enumeradas para avaliar se o nível de conhecimento financeiro de uma pessoa no Brasil é básico ou avançado. As perguntas devem ser de "Sim" ou "Não" e apresentadas no seguinte formato:
-1. Pergunta?
-Resposta: Sim ou Não
-
-Não inclua explicações adicionais ou comentários.`;
-
-    const aiResponse = await processLlamaModel(prompt);
-
-    res.json({ questions: aiResponse });
+    res.json({
+      questions: EVALUATION_QUESTIONS,
+      options: QUESTION_OPTIONS
+    });
   } catch (error) {
-    res.status(500).send(`Erro ao gerar perguntas: ${error}`);
+    res.status(500).send(`Erro ao buscar perguntas: ${error}`);
   }
 };
 

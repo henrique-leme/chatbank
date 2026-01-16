@@ -52,6 +52,32 @@ type Question = {
   options: string[];
 };
 
+// Novos tipos para avaliacao de perfil
+export interface EvaluationQuestion {
+  id: number;
+  dimension: string;
+  question: string;
+}
+
+export interface QuestionsResponse {
+  questions: EvaluationQuestion[];
+  options: readonly string[];
+}
+
+export interface EvaluationAnswer {
+  questionId: number;
+  answer: "Sim" | "Não" | "Não Sei";
+}
+
+export interface EvaluationResult {
+  profileType: "basic" | "advanced";
+  score: {
+    simCount: number;
+    totalAnswered: number;
+    percentage: number;
+  };
+}
+
 interface Chat {
   chatId: string;
   userId: string;
@@ -282,9 +308,9 @@ export const getUserProfile = async (uid: string): Promise<UserProfile> => {
 
 /**
  * Recupera as perguntas de nível financeiro.
- * @returns Perguntas de nível financeiro.
+ * @returns Perguntas de nível financeiro com opcoes.
  */
-export const getFinancialLevelQuestions = async (): Promise<string> => {
+export const getFinancialLevelQuestions = async (): Promise<QuestionsResponse> => {
   const url = `${backendUrl}/chat/questions/llama`;
 
   try {
@@ -301,9 +327,8 @@ export const getFinancialLevelQuestions = async (): Promise<string> => {
       },
     });
 
-    const data = await handleResponse(response);
-    const questions: string = data.questions;
-    return questions;
+    const data: QuestionsResponse = await handleResponse(response);
+    return data;
   } catch (error: any) {
     console.error("Erro ao buscar perguntas financeiras:", error);
     throw new Error(
@@ -314,24 +339,13 @@ export const getFinancialLevelQuestions = async (): Promise<string> => {
 
 /**
  * Avalia o nível financeiro do usuário com base nas respostas.
- * @param questions Lista de perguntas.
- * @param answers Lista de respostas correspondentes.
- * @returns Objeto contendo o tipo de perfil e a resposta da AI.
+ * @param answers Lista de respostas com questionId e answer.
+ * @returns Objeto contendo o tipo de perfil e o score.
  */
 export const evaluateFinancialLevel = async (
-  questions: Question[],
-  answers: string[]
-): Promise<{ profileType: string; aiResponse: string }> => {
+  answers: EvaluationAnswer[]
+): Promise<EvaluationResult> => {
   const url = `${backendUrl}/users/evaluate-finance-level/llama`;
-
-  const formattedQuestionsAndAnswers = questions
-    .map(
-      (question, index) =>
-        `${index + 1}. ${question.question} Resposta: ${answers[index]}`
-    )
-    .join("\n");
-
-  const prompt = `${formattedQuestionsAndAnswers} Baseado nas respostas, avalie em básico ou avançado e responda apenas com o nível da pessoa e mais nada.`;
 
   try {
     const token = await auth.currentUser?.getIdToken();
@@ -346,10 +360,10 @@ export const evaluateFinancialLevel = async (
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ prompt: prompt }),
+      body: JSON.stringify({ answers }),
     });
 
-    const data = await handleResponse(response);
+    const data: EvaluationResult = await handleResponse(response);
     return data;
   } catch (error: any) {
     console.error("Erro ao avaliar o nível financeiro:", error);
