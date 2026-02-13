@@ -8,14 +8,17 @@ interface AnalyticsEvent {
   parameters: Record<string, any>;
 }
 
+// Componente só renderiza em ambiente de desenvolvimento
+const isDevelopment = process.env.NODE_ENV === 'development';
+
 const AnalyticsDebug: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [events, setEvents] = useState<AnalyticsEvent[]>([]);
   const { getCurrentSessionDuration, isSessionActive } = useAnalytics();
 
-  // Interceptar eventos do GA4 para debug
+  // Interceptar eventos do GA4 para debug (só em desenvolvimento)
   useEffect(() => {
-    if (!isVisible) return;
+    if (!isDevelopment || !isVisible) return;
 
     const originalGtag = (window as any).gtag;
     if (originalGtag) {
@@ -52,6 +55,11 @@ const AnalyticsDebug: React.FC = () => {
       .map(([key, value]) => `${key}: ${value}`)
       .join(', ');
   };
+
+  // Não renderizar em produção
+  if (!isDevelopment) {
+    return null;
+  }
 
   if (!isVisible) {
     return (

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { getChatHistory, sendMessage, getUserProfile } from "../api/apiRoutes";

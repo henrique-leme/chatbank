@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { loginUser, RegisterData, registerUser } from "../api/apiRoutes";
+import { RegisterData, registerUser } from "../api/apiRoutes";
 import { z } from "zod";
 
 const registerSchema = z
@@ -67,16 +67,11 @@ const Register = () => {
         profileType: "basic",
       };
 
+      // registerUser já faz login automaticamente
       await registerUser(registerData);
 
-      const loginResponse = await loginUser({ email, password });
-
-      if (loginResponse.token) {
-        localStorage.setItem("authToken", loginResponse.token);
-        navigate("/chat", { state: { showEvaluationModal: true } });
-      } else {
-        throw new Error("Login após registro falhou.");
-      }
+      // Navegar para o chat após registro bem-sucedido
+      navigate("/chat", { state: { showEvaluationModal: true } });
     } catch (error: any) {
       if (error instanceof z.ZodError) {
         const fieldErrors: { [key: string]: string } = {};

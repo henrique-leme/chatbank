@@ -23,27 +23,12 @@ export const loginUser = async (req: Request, res: Response) => {
 
     console.log("Custom Token Gerado para Logar no Front SDK:", customToken);
 
-    res.status(200).json({ token: customToken, user });
+    // Remover senha do objeto antes de retornar
+    const { password: _, ...userWithoutPassword } = user;
+
+    res.status(200).json({ token: customToken, user: userWithoutPassword });
   } catch (error) {
     console.error("Erro ao fazer login:", error);
     res.status(500).send("Erro ao fazer login.");
   }
-};
-
-export const logoutUser = (req: Request, res: Response) => {
-  try {
-    res.status(200).send("Usuário deslogado com sucesso.");
-  } catch (error) {
-    res.status(500).send("Erro ao deslogar o usuário.");
-  }
-};
-
-export const getCurrentUser = (req: Request, res: Response) => {
-  const user = (req as any).user;
-
-  if (!user) {
-    return res.status(404).send("Usuário não autenticado.");
-  }
-
-  res.status(200).json(user);
 };

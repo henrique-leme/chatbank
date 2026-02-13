@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from "express";
 import * as admin from "firebase-admin";
-import { decode } from "punycode";
 
 export const authMiddleware = async (
   req: Request,
@@ -16,9 +15,7 @@ export const authMiddleware = async (
   console.log("Token Recebido no Middleware do Backend:", token);
 
   try {
-
     const decodedToken = await admin.auth().verifyIdToken(token);
-
     (req as any).user = decodedToken;
     next();
   } catch (error) {

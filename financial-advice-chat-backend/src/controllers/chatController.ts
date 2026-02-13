@@ -3,6 +3,7 @@ import {
   addMessageToChat,
   getChatByUserId,
   processFinanceModel,
+  UserContext,
 } from "../services/chatService";
 import { getUserById } from "../services/userService";
 import { EVALUATION_QUESTIONS, QUESTION_OPTIONS } from "../constants/evaluationQuestions";
@@ -36,32 +37,33 @@ export const addChatMessageFinance = async (req: Request, res: Response) => {
 
     const { profileType, income } = user;
 
-    const limit = 5;
+    // Buscar histórico de mensagens do usuário (últimas 5 para contexto)
+    const chatHistory = await getChatByUserId(userId, 5, null);
 
-    const chatHistory = await getChatByUserId(userId, limit, null);
+    // Criar contexto isolado do usuário
+    const userContext: UserContext = {
+      profileType: profileType || "basic",
+      income: income || 0,
+      userId,
+    };
 
-    let context = `Estas são as últimas 5 perguntas feitas por mim, que tenho um perfil financeiro "${profileType}" e ganhos mensais de R$${income}:\n`;
-    if (chatHistory && chatHistory.messages.length > 0) {
-      const lastFiveQuestions = chatHistory.messages
-        .map((message) => `Pergunta: ${message.question}`)
-        .join("\n");
+    console.log(`[${userId}] Processando pergunta com contexto isolado`);
 
-      context += lastFiveQuestions;
-    } else {
-      context += "Nenhum histórico disponível.\n";
-    }
+    // Processar com o modelo usando contexto estruturado
+    const aiResponse = await processFinanceModel(
+      question,
+      userContext,
+      chatHistory.messages
+    );
 
-    context += `\nE esta é a pergunta feita agora por mim: ${question}. Responda de forma clara e objetiva apenas a ultima pergunta feita, levando em conta o que já foi perguntado, elabore a resposta de acordo com o nível informado do usuário.`;
+    console.log(`[${userId}] Resposta gerada com sucesso`);
 
-    console.log(context);
-
-    const aiResponse = await processFinanceModel(context);
-    console.log("Realizou a chamada para a IA");
-
+    // Salvar mensagem no histórico do usuário
     await addMessageToChat(userId, question, aiResponse);
 
     res.json({ answer: aiResponse });
   } catch (error) {
+    console.error(`[${userId}] Erro ao processar mensagem:`, error);
     res.status(500).send(`Erro ao adicionar mensagem ao chat: ${error}`);
   }
 };
