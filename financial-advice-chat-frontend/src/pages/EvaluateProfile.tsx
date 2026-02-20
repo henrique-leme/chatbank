@@ -41,7 +41,7 @@ const EvaluateProfile = () => {
     };
 
     loadQuestions();
-  }, []);
+  }, [trackUserError]);
 
   const handleAnswer = (answer: AnswerOption) => {
     const currentQuestion = questions[currentStep];

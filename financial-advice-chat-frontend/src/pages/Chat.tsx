@@ -109,7 +109,7 @@ const Chat = () => {
     };
 
     loadChatHistory();
-  }, [user]);
+  }, [user, startChatbotSession, trackUserError]);
 
   const handleSendMessage = async () => {
     if (newMessage.trim() && user && !isSending) {

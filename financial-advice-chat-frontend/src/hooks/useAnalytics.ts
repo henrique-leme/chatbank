@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import {
   initializeGA4,
@@ -28,27 +28,27 @@ export const useAnalytics = () => {
     if (user) {
       trackPageView(window.location.pathname);
     }
-  }, [user, window.location.pathname]);
+  }, [user]);
 
   // Iniciar sessão do chatbot
-  const startChatbotSession = (profileType: string) => {
+  const startChatbotSession = useCallback((profileType: string) => {
     if (user && !isSessionActive) {
       sessionTrackerRef.current = new ChatbotSessionTracker(user.uid, profileType);
       trackChatbotSessionStart(user.uid, profileType);
       setIsSessionActive(true);
     }
-  };
+  }, [user, isSessionActive]);
 
   // Finalizar sessão do chatbot
-  const endChatbotSession = () => {
-    if (sessionTrackerRef.current && isSessionActive) {
+  const endChatbotSession = useCallback(() => {
+    if (sessionTrackerRef.current) {
       const sessionData = sessionTrackerRef.current.endSession();
       sessionTrackerRef.current = null;
       setIsSessionActive(false);
       return sessionData;
     }
     return null;
-  };
+  }, []);
 
   // Rastrear mensagem enviada
   const trackMessage = (message: string) => {
@@ -89,11 +89,11 @@ export const useAnalytics = () => {
   };
 
   // Rastrear erro
-  const trackUserError = (errorType: string, errorMessage: string) => {
+  const trackUserError = useCallback((errorType: string, errorMessage: string) => {
     if (user) {
       trackError(user.uid, errorType, errorMessage);
     }
-  };
+  }, [user]);
 
   // Rastrear avaliação de perfil
   const trackProfileEvaluation = (userId: string, evaluationType: string, score: number) => {
@@ -111,11 +111,9 @@ export const useAnalytics = () => {
   // Limpar sessão quando componente for desmontado
   useEffect(() => {
     return () => {
-      if (isSessionActive) {
-        endChatbotSession();
-      }
+      endChatbotSession();
     };
-  }, [isSessionActive]);
+  }, [endChatbotSession]);
 
   return {
     startChatbotSession,
