@@ -1,0 +1,30 @@
+# Dependências - devem ser instaladas dentro do container
+**/node_modules
+
+# Build artifacts
+**/dist
+**/build
+
+# Git
+.git
+.gitignore
+
+# Testes
+**/coverage
+**/__tests__
+
+# IDE
+**/.vscode
+**/.idea
+
+# OS
+**/.DS_Store
+**/Thumbs.db
+
+# Logs
+**/*.log
+**/npm-debug.log*
+
+# Terraform state (não precisa na imagem)
+infra/terraform/.terraform
+infra/terraform/terraform.tfstate*
