@@ -138,6 +138,13 @@ resource "aws_ecs_task_definition" "conversafina" {
           protocol      = "tcp"
         }
       ]
+      healthCheck = {
+        command     = ["CMD-SHELL", "wget -qO- http://localhost:8081/health || exit 1"]
+        interval    = 30
+        timeout     = 5
+        retries     = 3
+        startPeriod = 60
+      }
     },
     {
       name      = "conversafina-frontend"
