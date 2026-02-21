@@ -2,12 +2,13 @@ FROM node:22-slim AS build
 
 WORKDIR /app
 
-# Copiar package files primeiro para otimizar cache de layers
-COPY financial-advice-chat-frontend/package*.json ./
-RUN npm install
-
-# Copiar codigo fonte e buildar
+# Copiar todo o codigo fonte
 COPY financial-advice-chat-frontend .
+
+# Limpar qualquer node_modules copiado e instalar do zero
+RUN rm -rf node_modules && npm install
+
+# Buildar
 RUN npm run build
 
 # Stage de producao
