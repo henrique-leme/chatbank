@@ -1,7 +1,7 @@
 import { db } from "../config/firebase";
 import { User, userSchema, userUpdateSchema } from "../models/userSchema";
 import { v4 as uuidv4 } from "uuid";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 
 export const getUserById = async (uid: string): Promise<User | null> => {
   const userDoc = await db.collection("users").doc(uid).get();

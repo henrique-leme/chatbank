@@ -228,11 +228,12 @@ resource "aws_security_group" "conversafina" {
 }
 
 resource "aws_ecs_service" "conversafina" {
-  name            = var.aws_ecs_service_name
-  cluster         = aws_ecs_cluster.conversafina.name
-  task_definition = aws_ecs_task_definition.conversafina.arn
-  desired_count   = 1
-  launch_type      = "FARGATE"
+  name                 = var.aws_ecs_service_name
+  cluster              = aws_ecs_cluster.conversafina.name
+  task_definition      = aws_ecs_task_definition.conversafina.arn
+  desired_count        = 1
+  launch_type          = "FARGATE"
+  force_new_deployment = true
   network_configuration {
     security_groups = [aws_security_group.conversafina.id]
     subnets         = [data.aws_subnet.conversafina.id]

@@ -5,7 +5,7 @@ set -e
 IMAGE_NAME=conversafina-backend
 IMAGE_VERSION=1.0.0
 
-docker build -t $IMAGE_NAME:$IMAGE_VERSION -f backend/Dockerfile ..
+docker build --no-cache --pull -t $IMAGE_NAME:$IMAGE_VERSION -f backend/Dockerfile ..
 
 #push to ecr
 AWS_ACCOUNT_ID=`aws sts get-caller-identity --query Account --output text`
