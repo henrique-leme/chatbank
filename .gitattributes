@@ -1,2 +1,11 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Shell scripts sempre com LF (Unix line endings)
+*.sh text eol=lf
+
+# Dockerfiles sempre com LF
+Dockerfile text eol=lf
+
+# Nginx e outras configs sempre com LF
+*.conf text eol=lf
