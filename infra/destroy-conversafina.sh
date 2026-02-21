@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/usr/bin/env bash
 set -e
 
 echo "Inciando script de destrição App Conversafina..."
