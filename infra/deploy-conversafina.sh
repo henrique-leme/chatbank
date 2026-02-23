@@ -9,6 +9,7 @@ bash push-backend-image-to-ecr.sh
 bash push-nginx-image-to-ecr.sh
 
 echo "Iniciando o deploy dos containers para o ecs..."
+terraform -chdir=terraform init -upgrade
 terraform -chdir=terraform apply -auto-approve
 
 echo "Deploy concluido com sucesso!"
