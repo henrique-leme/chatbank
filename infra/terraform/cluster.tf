@@ -131,6 +131,16 @@ resource "aws_ecs_task_definition" "conversafina" {
           max-buffer-size       = "25m" 
         }
       }
+      environment = [
+        {
+          name  = "JWT_SECRET"
+          value = "financial_assistante_secret_key"
+        },
+        {
+          name  = "DEEPL_API_KEY"
+          value = "99f8107a-c1dd-4803-9d3a-2af140a83efb:fx"
+        }
+      ]
       portMappings = [
         {
           containerPort = 8081
