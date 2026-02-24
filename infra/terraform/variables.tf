@@ -25,7 +25,7 @@ variable "operating_system_family" {
 variable "cpu_architecture" {
     type = string
     description = "Arquitetura computacional da instância Fargate"
-    default = "ARM64"
+    default = "X86_64"
 }
 
 variable "aws_ecs_cluster_name" {
