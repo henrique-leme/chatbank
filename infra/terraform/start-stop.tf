@@ -72,6 +72,7 @@ resource "aws_lambda_function" "start_stop_services" {
   function_name = "start-stop-services"
   handler       = "index.handler"
   runtime       = "nodejs22.x"
+  timeout       = 30
   role          = aws_iam_role.lambda_exec.arn
   environment {
     variables = {
