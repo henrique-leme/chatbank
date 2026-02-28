@@ -31,6 +31,7 @@ RUN npm install -g serve
 
 # Configurar ddclient
 COPY infra/frontend/config/ddclient.conf /etc/ddclient.conf
+RUN chmod 600 /etc/ddclient.conf
 
 WORKDIR /app
 
@@ -39,4 +40,4 @@ COPY --from=build /app/build ./build
 
 ENV PORT=8080
 EXPOSE 8080
-ENTRYPOINT ["sh", "-c", "ddclient & serve -s build -l 8080"]
+ENTRYPOINT ["sh", "-c", "ddclient -foreground -verbose & serve -s build -l 8080"]
