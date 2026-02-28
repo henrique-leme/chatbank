@@ -25,19 +25,19 @@ RUN npm run build
 # Stage de producao
 FROM node:22-slim
 
-# Instalar ddclient e serve
-RUN apt-get update && apt-get install -y --no-install-recommends ddclient && rm -rf /var/lib/apt/lists/*
+# Instalar curl e serve
+RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
 RUN npm install -g serve
-
-# Configurar ddclient
-COPY infra/frontend/config/ddclient.conf /etc/ddclient.conf
-RUN chmod 600 /etc/ddclient.conf
 
 WORKDIR /app
 
 # Copiar apenas o build estatico (sem node_modules, sem source)
 COPY --from=build /app/build ./build
 
+# Script de atualizacao de DNS na inicializacao
+COPY infra/frontend/config/update-dns.sh /usr/local/bin/update-dns.sh
+RUN chmod +x /usr/local/bin/update-dns.sh
+
 ENV PORT=8080
 EXPOSE 8080
-ENTRYPOINT ["sh", "-c", "ddclient -foreground -verbose & serve -s build -l 8080"]
+ENTRYPOINT ["sh", "-c", "/usr/local/bin/update-dns.sh && serve -s build -l 8080"]
