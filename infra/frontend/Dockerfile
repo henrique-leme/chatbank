@@ -26,7 +26,7 @@ RUN npm run build
 FROM node:22-slim
 
 # Instalar curl e serve
-RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certificates && rm -rf /var/lib/apt/lists/*
 RUN npm install -g serve
 
 WORKDIR /app
